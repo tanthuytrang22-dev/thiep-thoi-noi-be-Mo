@@ -1,681 +1,202 @@
 import { useEffect, useState } from "react";
 
- 
-
 export default function Home() {
+  // Event details (easy to edit)
+  const childName = "Bé Minh Triết (Mỡ)";
+  const eventDateISO = "2025-11-02T11:30:00+07:00"; // YYYY-MM-DDTHH:mm:ss+07:00
+  const eventPlace = "Khu Chung cư đường Tân An 4";
+  const inviteLine = "Mời cô chú, anh chị cùng đến chung vui cùng bé Mỡ tròn 1 tuổi";
+  const theme = "tropical-green";
+  const musicFile = "/happy-birthday.mp3"; // put your mp3 in public/ folder or replace with full URL
 
-  const [wishes, setWishes] = useState([]);
-
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft());
+  const [wishes, setWishes] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("wishes_minhtriet")) || [];
+    } catch (e) {
+      return [];
+    }
+  });
   const [name, setName] = useState("");
-
   const [message, setMessage] = useState("");
-
-  const [isPlaying, setIsPlaying] = useState(true);
-
- 
-
-  // 10 placeholder image slots (you can replace any entry with a real image URL later)
-
-  const [images, setImages] = useState(Array.from({ length: 10 }).map(() => ""));
-
- 
+  const [playing, setPlaying] = useState(true);
 
   useEffect(() => {
-
-    const audio = document.getElementById("bgMusic");
-
-    if (audio) {
-
-      audio.volume = 0.45;
-
-      // try to autoplay quietly if allowed
-
-      audio.play().catch(() => {});
-
-    }
-
+    const t = setInterval(() => setTimeLeft(getTimeLeft()), 1000);
+    return () => clearInterval(t);
   }, []);
 
- 
+  useEffect(() => {
+    localStorage.setItem("wishes_minhtriet", JSON.stringify(wishes));
+  }, [wishes]);
 
-  const handleSubmit = (e) => {
+  function getTimeLeft() {
+    const now = new Date();
+    const target = new Date(eventDateISO);
+    const diff = target - now;
+    if (diff <= 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    return { days, hours, minutes, seconds };
+  }
 
+  function submitWish(e) {
     e.preventDefault();
-
     if (!name.trim() || !message.trim()) return;
-
-    const newWish = { name: name.trim(), message: message.trim(), id: Date.now() };
-
-    setWishes([newWish, ...wishes]);
-
+    const newW = { id: Date.now(), name: name.trim(), message: message.trim() };
+    setWishes([newW, ...wishes]);
     setName("");
-
     setMessage("");
+  }
 
-  };
-
- 
-
-  const toggleMusic = () => {
-
-    const audio = document.getElementById("bgMusic");
-
-    if (!audio) return;
-
-    if (isPlaying) {
-
-      audio.pause();
-
-    } else {
-
-      audio.play().catch(() => {});
-
-    }
-
-    setIsPlaying(!isPlaying);
-
-  };
-
- 
+  function clearWishes() {
+    if (confirm("Xóa toàn bộ lời chúc?")) setWishes([]);
+  }
 
   return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-green-100 p-6">
+      <audio src={musicFile} autoPlay loop muted={!playing} id="bg-music" />
 
-    <div className="page">
-
-      {/* Sparkles */}
-
-      <div className="sparkles" aria-hidden />
-
- 
-
-      {/* Floating balloons (decorative) */}
-
-      <div className="balloons" aria-hidden>
-
-        {[...Array(6)].map((_, i) => (
-
-          <div key={i} className={`balloon b${i + 1}`} />
-
-        ))}
-
-      </div>
-
- 
-
-      <header className="hero">
-
-        <h1 className="title">Thiệp Mời Thôi Nôi Bé Mỡ 🎂</h1>
-
-        <p className="subtitle">Trân trọng kính mời mọi người đến chung vui cùng bé Minh Triết 💚</p>
-
- 
-
-        {/* Avatar / main photo (temporary) */}
-
-        <div className="avatar">
-
-          <div className="avatar-ring" />
-
-          <div className="avatar-inner">Ảnh bé Mỡ đang cập nhật ✨</div>
-
-          <div className="avatar-glow" />
-
+      {/* Card */}
+      <div className="relative max-w-3xl w-full bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden border border-green-200">
+        {/* Pastel balloons (absolute) */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="animate-bubble absolute left-6 -top-8 opacity-80">
+            <div className="w-14 h-18 rounded-full transform -rotate-12 balloon pastel-1"></div>
+          </div>
+          <div className="animate-bubble2 absolute right-10 -top-6 opacity-80">
+            <div className="w-16 h-20 rounded-full balloon pastel-2"></div>
+          </div>
+          <div className="animate-bubble3 absolute left-40 top-6 opacity-80">
+            <div className="w-12 h-16 rounded-full balloon pastel-3"></div>
+          </div>
+          <div className="absolute right-40 bottom-6 opacity-70">
+            <div className="w-20 h-24 rounded-full balloon pastel-4"></div>
+          </div>
         </div>
 
-      </header>
+        <div className="p-8 md:p-12 relative z-10">
+          <div className="flex items-start gap-6">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-green-800">{childName}</h1>
+              <p className="mt-2 text-green-700/90">{inviteLine}</p>
 
- 
-
-      <main className="content">
-
-        <section className="info card">
-
-          <h2>🍼 Thông Tin Bữa Tiệc</h2>
-
-          <div className="info-list">
-
-            <div><strong>Bé:</strong> Minh Triết (Mỡ)</div>
-
-            <div><strong>Ngày:</strong> 02/11/2024</div>
-
-            <div><strong>Thời gian:</strong> 11h30</div>
-
-            <div><strong>Địa điểm:</strong> Khu Chung cư đường Tân An 4 </div>
-
-          </div>
-
-        </section>
-
- 
-
-        <section className="gallery card">
-
-          <h2>📸 Album bé Mỡ (10 ảnh — thay link khi có)</h2>
-
-          <div className="grid">
-
-            {images.map((src, idx) => (
-
-              <div key={idx} className="grid-item">
-
-                {src ? (
-
-                  <img src={src} alt={`bé mỡ ${idx + 1}`} />
-
-                ) : (
-
-                  <div className="placeholder">
-
-                    <div className="placeholder-text">Ảnh {idx + 1}<br/>đang cập nhật ✨</div>
-
-                  </div>
-
-                )}
-
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="p-4 rounded-lg bg-white border border-green-100">
+                  <div className="text-xs text-green-500 uppercase">Ngày</div>
+                  <div className="mt-1 font-semibold">02/11/2025</div>
+                </div>
+                <div className="p-4 rounded-lg bg-white border border-green-100">
+                  <div className="text-xs text-green-500 uppercase">Thời gian</div>
+                  <div className="mt-1 font-semibold">11:30</div>
+                </div>
+                <div className="p-4 rounded-lg bg-white border border-green-100">
+                  <div className="text-xs text-green-500 uppercase">Địa điểm</div>
+                  <div className="mt-1 font-semibold">{eventPlace}</div>
+                </div>
               </div>
 
-            ))}
-
-          </div>
-
-          <p className="hint">Mẹ/ba chỉ cần cập nhật URL ảnh tương ứng (mình hướng dẫn nếu cần).</p>
-
-        </section>
-
- 
-
-        <section className="wishes card">
-
-          <h2>💌 Gửi Lời Chúc Đến Bé Mỡ</h2>
-
-          <form onSubmit={handleSubmit} className="wish-form" aria-label="Gửi lời chúc">
-
-            <input
-
-              type="text"
-
-              placeholder="Tên của bạn"
-
-              value={name}
-
-              onChange={(e) => setName(e.target.value)}
-
-              required
-
-            />
-
-            <textarea
-
-              placeholder="Lời chúc dễ thương..."
-
-              value={message}
-
-              onChange={(e) => setMessage(e.target.value)}
-
-              rows={3}
-
-              required
-
-            />
-
-            <button type="submit" className="btn-send">Gửi lời chúc 💚</button>
-
-          </form>
-
- 
-
-          <div className="messages">
-
-            {wishes.length === 0 ? (
-
-              <p className="muted">Chưa có lời chúc nào — bạn là người đầu tiên nhé!</p>
-
-            ) : (
-
-              wishes.map((w) => (
-
-                <div key={w.id} className="message">
-
-                  <strong>{w.name}</strong>
-
-                  <div className="msg-text">{w.message}</div>
-
+              {/* Countdown */}
+              <div className="mt-6 flex items-center gap-4">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-green-100 to-green-50 border border-green-200">
+                  {timeLeft ? (
+                    <div className="flex items-center gap-4 text-green-800">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{timeLeft.days}</div>
+                        <div className="text-xs">ngày</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{String(timeLeft.hours).padStart(2, "0")}</div>
+                        <div className="text-xs">giờ</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{String(timeLeft.minutes).padStart(2, "0")}</div>
+                        <div className="text-xs">phút</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">{String(timeLeft.seconds).padStart(2, "0")}</div>
+                        <div className="text-xs">giây</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-green-800 font-semibold">Sự kiện đã bắt đầu — hẹn gặp tại chỗ!</div>
+                  )}
                 </div>
 
-              ))
+                <button
+                  onClick={() => setPlaying((s) => !s)}
+                  className={`px-4 py-2 rounded-md border ${playing ? "bg-green-600 text-white" : "bg-white text-green-700"}`}>
+                  {playing ? "Tắt nhạc" : "Bật nhạc"}
+                </button>
+              </div>
+            </div>
 
-            )}
+            {/* Right column: image + wishes */}
+            <div className="w-44 md:w-56 flex-shrink-0">
+              <div className="rounded-xl overflow-hidden border border-green-100 shadow-sm">
+                <img src="/baby-sample.jpg" alt="bé" className="w-full h-40 object-cover" />
+              </div>
 
+              <div className="mt-4 p-3 bg-white rounded-lg border border-green-50">
+                <div className="text-sm font-medium text-green-800">Gửi lời chúc</div>
+                <form onSubmit={submitWish} className="mt-2 flex flex-col gap-2">
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Tên" className="px-3 py-2 rounded border" />
+                  <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Lời chúc" className="px-3 py-2 rounded border" />
+                  <button className="mt-1 px-3 py-2 bg-green-600 text-white rounded">Gửi</button>
+                </form>
+                <div className="mt-3 text-xs text-green-600">Lời chúc đã gửi: {wishes.length}</div>
+                <button onClick={clearWishes} className="mt-2 text-xs underline">Xóa tất cả</button>
+              </div>
+            </div>
           </div>
 
-        </section>
+          {/* Wishes list */}
+          <div className="mt-8">
+            <h3 className="text-sm font-semibold text-green-700">Lời chúc từ khách mời</h3>
+            <div className="mt-3 grid gap-3">
+              {wishes.length === 0 && <div className="text-sm text-green-500">Chưa có lời chúc nào — bạn là người đầu tiên!</div>}
+              {wishes.map((w) => (
+                <div key={w.id} className="p-3 bg-white rounded-lg border border-green-50 shadow-sm">
+                  <div className="text-sm font-semibold text-green-800">{w.name}</div>
+                  <div className="mt-1 text-sm text-green-700">{w.message}</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
- 
+          <div className="mt-8 text-center text-xs text-green-600">Thiệp mời tự động — mang theo nụ cười nhé 😊</div>
+        </div>
+      </div>
 
-        <section className="thanks card">
-
-          <h2>❤️ Cảm ơn</h2>
-
-          <p>Gia đình cảm ơn mọi người đã dành thời gian và tấm lòng cho bé Mỡ 💕</p>
-
-        </section>
-
-      </main>
-
- 
-
-      {/* Audio */}
-
-      <audio
-
-        id="bgMusic"
-
-        loop
-
-        src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_45b8e29c10.mp3?filename=happy-birthday-piano-14175.mp3"
-
-      />
-
- 
-
-      {/* Music control */}
-
-      <button className="music-btn" onClick={toggleMusic} aria-label="Bật/Tắt nhạc">
-
-        {isPlaying ? "🎵" : "🔇"}
-
-      </button>
-
- 
-
+      {/* Inline styles for pastel balloons + animations */}
       <style jsx>{`
+        .balloon { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .pastel-1 { background: linear-gradient(135deg,#c9f7d6,#f0fff4); }
+        .pastel-2 { background: linear-gradient(135deg,#d9f1ff,#f3fbff); }
+        .pastel-3 { background: linear-gradient(135deg,#fff3d9,#fffdf3); }
+        .pastel-4 { background: linear-gradient(135deg,#fde5ff,#fff6fb); }
 
-        .page {
-
-          font-family: "Quicksand", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-
-          background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%);
-
-          color: #234927;
-
-          min-height: 100vh;
-
+        @keyframes floatUp {
+          0% { transform: translateY(0) scale(1); opacity: 0.95; }
+          50% { transform: translateY(-10px) scale(1.02); }
+          100% { transform: translateY(-200px) scale(0.95); opacity: 0.6; }
         }
+        .animate-bubble { animation: floatUp 12s linear infinite; }
+        .animate-bubble2 { animation: floatUp 14s linear infinite; }
+        .animate-bubble3 { animation: floatUp 10s linear infinite; }
 
- 
-
-        /* Sparkles */
-
-        .sparkles {
-
-          position: fixed;
-
-          inset: 0;
-
-          pointer-events: none;
-
-          z-index: 2;
-
+        /* small responsive tweaks */
+        @media (max-width: 768px) {
+          .animate-bubble, .animate-bubble2, .animate-bubble3 { display: none; }
         }
-
-        .sparkles::before,
-
-        .sparkles::after {
-
-          content: "";
-
-          position: absolute;
-
-          width: 6px;
-
-          height: 6px;
-
-          background: radial-gradient(circle at 30% 30%, #fff, #ffd54f);
-
-          border-radius: 50%;
-
-          filter: blur(0.6px);
-
-          animation: twinkle 3s infinite;
-
-          opacity: 0.9;
-
-        }
-
-        .sparkles::before { left: 20%; top: 12%; animation-delay: 0s; transform: scale(.9); }
-
-        .sparkles::after { left: 72%; top: 22%; animation-delay: 1.2s; transform: scale(1.1); }
-
-        @keyframes twinkle {
-
-          0% { opacity: 0; transform: scale(0.6); }
-
-          50% { opacity: 1; transform: scale(1.2); }
-
-          100% { opacity: 0; transform: scale(0.6); }
-
-        }
-
- 
-
-        /* Balloons */
-
-        .balloons { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-
-        .balloon {
-
-          position: absolute;
-
-          bottom: -120px;
-
-          width: 56px;
-
-          height: 72px;
-
-          border-radius: 50%;
-
-          opacity: 0.95;
-
-          box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-
-        }
-
-        .b1 { left: 6%; background: linear-gradient(#ffeb3b,#ffd54f); animation: float1 12s infinite ease-in; }
-
-        .b2 { left: 20%; background: linear-gradient(#81c784,#66bb6a); animation: float2 14s infinite ease-in 2s; }
-
-        .b3 { left: 36%; background: linear-gradient(#fff176,#fff59d); animation: float1 11s infinite ease-in 1s; }
-
-        .b4 { left: 56%; background: linear-gradient(#a5d6a7,#81c784); animation: float2 13s infinite ease-in 0.5s; }
-
-        .b5 { left: 72%; background: linear-gradient(#c5e1a5,#aed581); animation: float1 15s infinite ease-in 3s; }
-
-        .b6 { left: 88%; background: linear-gradient(#fff9c4,#fff176); animation: float2 10s infinite ease-in 1.5s; }
-
-        @keyframes float1 { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-100vh) rotate(20deg); } }
-
-        @keyframes float2 { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-120vh) rotate(-20deg); } }
-
- 
-
-        .hero {
-
-          padding: 56px 20px 20px;
-
-          text-align: center;
-
-          position: relative;
-
-          z-index: 3;
-
-        }
-
-        .title {
-
-          font-family: "Pacifico", cursive;
-
-          font-size: 2.6rem;
-
-          margin: 0;
-
-          color: #3e8a3e;
-
-          text-shadow: 0 2px 8px rgba(0,0,0,0.06);
-
-        }
-
-        .subtitle {
-
-          margin: 8px 0 20px;
-
-          color: #4b6f4b;
-
-          opacity: 0.95;
-
-        }
-
- 
-
-        /* Avatar */
-
-        .avatar { position: relative; width: 190px; height: 190px; margin: 18px auto 6px; }
-
-        .avatar-ring {
-
-          position: absolute; inset: 0; border-radius: 50%;
-
-          background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.3));
-
-          box-shadow: 0 0 40px rgba(255, 243, 179, 0.6);
-
-          transform: rotate(-6deg);
-
-        }
-
-        .avatar-inner {
-
-          position: absolute; inset: 12px;
-
-          border-radius: 50%;
-
-          background: rgba(255,255,255,0.95);
-
-          display: flex; align-items: center; justify-content: center;
-
-          font-style: italic; color: #3a7f3a; padding: 10px; text-align: center;
-
-          box-shadow: inset 0 6px 18px rgba(0,0,0,0.03);
-
-          transform: translateY(0);
-
-          transition: transform 0.4s ease;
-
-        }
-
-        .avatar-inner:hover { transform: translateY(-6px); }
-
-        .avatar-glow {
-
-          position: absolute; inset: -6px; border-radius: 50%;
-
-          background: radial-gradient(circle, rgba(255,250,200,0.7), rgba(255,250,200,0));
-
-          filter: blur(12px); pointer-events: none;
-
-        }
-
- 
-
-        .content { padding: 18px 16px 80px; z-index: 3; position: relative; }
-
- 
-
-        .card {
-
-          max-width: 980px;
-
-          margin: 18px auto;
-
-          background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
-
-          border-radius: 14px;
-
-          padding: 18px;
-
-          box-shadow: 0 6px 24px rgba(0,0,0,0.06);
-
-        }
-
- 
-
-        .info-list { text-align: center; line-height: 1.8; color: #2f5c2f; }
-
- 
-
-        /* Gallery grid */
-
-        .gallery .grid {
-
-          display: grid;
-
-          grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
-
-          gap: 12px;
-
-          margin-top: 12px;
-
-        }
-
-        .grid-item {
-
-          height: 120px;
-
-          border-radius: 10px;
-
-          overflow: hidden;
-
-          background: linear-gradient(180deg, #f7fff7, #fbfff2);
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: center;
-
-          position: relative;
-
-          box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-
-          transform-origin: center;
-
-          animation: itemIn 0.6s ease both;
-
-        }
-
-        .grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-        .placeholder {
-
-          width: 100%; height: 100%; display:flex; align-items:center; justify-content:center;
-
-          color: #4b6f4b; font-size: 0.95rem; text-align:center; padding: 8px;
-
-        }
-
-        .placeholder-text { line-height:1.1; }
-
- 
-
-        @keyframes itemIn {
-
-          from { opacity: 0; transform: scale(0.98) translateY(6px); }
-
-          to { opacity: 1; transform: scale(1) translateY(0); }
-
-        }
-
- 
-
-        .hint { margin-top: 10px; font-size: 0.9rem; color: #6b856b; text-align:center; }
-
- 
-
-        /* Wishes */
-
-        .wish-form input, .wish-form textarea {
-
-          width: 100%;
-
-          padding: 10px;
-
-          border-radius: 10px;
-
-          border: 1px solid #cfe9c8;
-
-          font-size: 0.98rem;
-
-        }
-
-        .btn-send {
-
-          background: linear-gradient(90deg, #81c784, #ffeb3b);
-
-          border: none;
-
-          padding: 10px 14px;
-
-          margin-top: 6px;
-
-          border-radius: 10px;
-
-          font-weight: 600;
-
-          cursor: pointer;
-
-        }
-
-        .messages { margin-top: 14px; }
-
-        .message { background: #f8fff1; border-left: 5px solid #8bc34a; padding: 10px; border-radius: 8px; margin-bottom: 8px; }
-
- 
-
-        .muted { color: #6b856b; text-align: center; }
-
- 
-
-        .thanks { text-align: center; color: #4b6f4b; }
-
- 
-
-        /* music btn */
-
-        .music-btn {
-
-          position: fixed;
-
-          right: 18px;
-
-          bottom: 18px;
-
-          width: 52px;
-
-          height: 52px;
-
-          border-radius: 50%;
-
-          border: none;
-
-          background: linear-gradient(180deg,#81c784,#5aa25a);
-
-          color: white;
-
-          font-size: 1.25rem;
-
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-
-          cursor: pointer;
-
-          z-index: 999;
-
-        }
-
- 
-
-        /* Responsive tweaks */
-
-        @media (max-width: 600px) {
-
-          .title { font-size: 2.1rem; }
-
-          .avatar { width: 150px; height: 150px; }
-
-        }
-
       `}</style>
 
+      {/* Small global styles (Tailwind assumed available) */}
+      <style jsx global>{`
+        html, body, #__next { height: 100%; }
+      `}</style>
     </div>
-
   );
-
 }
