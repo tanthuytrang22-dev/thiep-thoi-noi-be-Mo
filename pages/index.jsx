@@ -17,8 +17,9 @@ export default function Home() {
     }
   }, []);
 
+  // Countdown
   useEffect(() => {
-    const targetDate = new Date("2024-11-02T11:30:00").getTime();
+    const targetDate = new Date("2025-11-02T11:30:00").getTime();
     const timer = setInterval(() => {
       const now = new Date().getTime();
       const distance = targetDate - now;
@@ -36,6 +37,7 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  // Scroll fade + glow effect
   useEffect(() => {
     const sections = document.querySelectorAll("section");
     const reveal = () => {
@@ -67,12 +69,13 @@ export default function Home() {
     setIsPlaying(!isPlaying);
   };
 
+  // Balloon animation: generate random balloons
   const [balloons, setBalloons] = useState([]);
   useEffect(() => {
     const colors = ["#FFB6C1", "#FFDAB9", "#E0FFFF", "#E6E6FA", "#FFFACD"];
     const newBalloons = Array.from({ length: 12 }).map(() => ({
       left: Math.random() * 90 + "%",
-      size: 25 + Math.random() * 35 + "px",
+      size: 30 + Math.random() * 40 + "px",
       color: colors[Math.floor(Math.random() * colors.length)],
       duration: 8 + Math.random() * 6 + "s",
       delay: Math.random() * 5 + "s",
@@ -186,4 +189,41 @@ export default function Home() {
       <button className="music-btn" onClick={toggleMusic}>{isPlaying ? "🎵" : "🔇"}</button>
 
       <style jsx>{`
-        .page { font-family: "Quicksand", system-ui, sans-serif; background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%); color: #234927; min-height: 100vh; display: flex; flex-direction: column; align-items: center; text-align
+        .page { font-family: "Quicksand", system-ui, sans-serif; background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%); color: #234927; min-height: 100vh; display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 80px; }
+        .hero { padding: 40px 20px 20px; }
+        .title { font-size: 2.4rem; margin-bottom: 12px; font-weight: 700; color: #1b5e20; }
+        .subtitle { font-size: 1.15rem; color: #4b7754; max-width: 600px; margin: 0 auto 24px; }
+        .avatar { position: relative; width: 140px; height: 140px; margin: 0 auto; }
+        .avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: #fffbe6; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #5a5a5a; text-align: center; padding: 8px; }
+        .avatar-ring { position: absolute; top: -8px; left: -8px; width: 156px; height: 156px; border-radius: 50%; border: 3px solid #ffe082; z-index: -1; }
+        .avatar-glow { position: absolute; top: -16px; left: -16px; width: 172px; height: 172px; border-radius: 50%; box-shadow: 0 0 28px rgba(255, 230, 90, 0.5); z-index: -2; }
+        section { width: 90%; max-width: 960px; margin: 28px auto; padding: 22px 20px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); opacity: 0; transform: translateY(30px); transition: all 1s ease; background: #fffdf5; }
+        section.visible { opacity: 1; transform: translateY(0); animation: glow 2.8s ease-out; }
+        @keyframes glow { 0% { box-shadow: 0 0 0 rgba(255, 255, 255, 0); } 25% { box-shadow: 0 0 18px rgba(255, 243, 150, 0.6); } 50% { box-shadow: 0 0 28px rgba(255, 230, 90, 0.8); } 100% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); } }
+        .countdown-box { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; margin-top: 14px; }
+        .time-box { background: linear-gradient(180deg, #fffef0, #fffde7); border: 2px solid #f3e5ab; border-radius: 14px; padding: 14px 20px; min-width: 70px; box-shadow: 0 6px 16px rgba(0,0,0,0.05), 0 0 12px rgba(255,235,59,0.3); }
+        .time-box span { font-size: 1.9rem; font-weight: 700; color: #2e7d32; }
+        .time-box p { margin: 0; color: #5f7d5f; font-size: 0.95rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-top: 12px; }
+        .grid-item img { width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .placeholder { width: 100%; height: 100px; border-radius: 12px; background: #fff7e6; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .placeholder-text { font-size: 0.85rem; color: #7a7a7a; }
+        .wish-form input, .wish-form textarea { width: 100%; padding: 10px 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.95rem; }
+        .btn-send { background: linear-gradient(180deg,#81c784,#5aa25a); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: transform 0.2s; }
+        .btn-send:hover { transform: scale(1.05); }
+        .messages .message { background: #fffde7; border-radius: 12px; padding: 10px 14px; margin-top: 8px; text-align: left; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+        .music-btn { position: fixed; right: 18px; bottom: 18px; width: 56px; height: 56px; border-radius: 50%; border: none; background: linear-gradient(180deg,#81c784,#5aa25a); color: white; font-size: 1.3rem; box-shadow: 0 8px 22px rgba(0,0,0,0.18); cursor: pointer; z-index: 999; transition: transform 0.2s; }
+        .music-btn:hover { transform: scale(1.1); }
+
+        /* Balloon animation */
+        .balloons { position: fixed; width: 100%; height: 100%; top:0; left:0; pointer-events:none; overflow: hidden; }
+        .balloon { position: absolute; bottom: -60px; border-radius: 50%; opacity: 0.85; animation-name: floatUp; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+        @keyframes floatUp {
+          0% { transform: translateY(0) rotate(0deg); opacity:0.7; }
+          50% { transform: translateY(-50vh) rotate(15deg); opacity:0.85; }
+          100% { transform: translateY(-110vh) rotate(-10deg); opacity:0; }
+        }
+      `}</style>
+    </div>
+  );
+}
