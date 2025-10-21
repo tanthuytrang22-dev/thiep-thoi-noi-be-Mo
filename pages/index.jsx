@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { db } from "./firebase";
-import { collection, addDoc, onSnapshot, orderBy, query } from "firebase/firestore";
 
 export default function Home() {
   const [wishes, setWishes] = useState([]);
@@ -9,28 +7,8 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [images] = useState(Array.from({ length: 10 }).map(() => ""));
+  const [balloons, setBalloons] = useState([]);
 
-  // 🔥 Lấy dữ liệu lời chúc realtime từ Firebase
-  useEffect(() => {
-    const q = query(collection(db, "wishes"), orderBy("id", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const list = snapshot.docs.map((doc) => doc.data());
-      setWishes(list);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // 📝 Gửi lời chúc
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!name.trim() || !message.trim()) return;
-    const newWish = { id: Date.now(), name: name.trim(), message: message.trim() };
-    await addDoc(collection(db, "wishes"), newWish);
-    setName("");
-    setMessage("");
-  };
-
-  // 🎵 Phát nhạc nền
   useEffect(() => {
     const audio = document.getElementById("bgMusic");
     if (audio) {
@@ -39,15 +17,7 @@ export default function Home() {
     }
   }, []);
 
-  const toggleMusic = () => {
-    const audio = document.getElementById("bgMusic");
-    if (!audio) return;
-    if (isPlaying) audio.pause();
-    else audio.play().catch(() => {});
-    setIsPlaying(!isPlaying);
-  };
-
-  // ⏳ Countdown
+  // Countdown
   useEffect(() => {
     const targetDate = new Date("2025-11-02T11:30:00").getTime();
     const timer = setInterval(() => {
@@ -67,7 +37,7 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  // ✨ Hiệu ứng xuất hiện khi scroll
+  // Scroll fade + glow effect
   useEffect(() => {
     const sections = document.querySelectorAll("section");
     const reveal = () => {
@@ -82,8 +52,40 @@ export default function Home() {
     return () => window.removeEventListener("scroll", reveal);
   }, []);
 
-  // 🎈 Bong bóng
-  const [balloons, setBalloons] = useState([]);
+  // Handle wish submit
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!name.trim() || !message.trim()) return;
+
+  const newWish = { name: name.trim(), message: message.trim(), id: Date.now() };
+  setWishes([newWish, ...wishes]);
+  setName("");
+  setMessage("");
+
+  // ✅ Gửi dữ liệu lên Google Sheets
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbxC3P86qjQ-oQSCd5z5qWQ5B6rd2DyCIc_c9K2fqMaN50r-CoGIqmUH3zHo8l-avF6cEA/exec", {
+      method: "POST",
+      mode: "no-cors", // tránh lỗi CORS
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newWish.name, message: newWish.message }),
+    });
+    console.log("✅ Đã gửi lời chúc lên Google Sheets");
+  } catch (err) {
+    console.error("❌ Lỗi khi gửi lời chúc:", err);
+  }
+};
+
+
+  const toggleMusic = () => {
+    const audio = document.getElementById("bgMusic");
+    if (!audio) return;
+    if (isPlaying) audio.pause();
+    else audio.play().catch(() => {});
+    setIsPlaying(!isPlaying);
+  };
+
+  // Balloon animation
   useEffect(() => {
     const colors = ["#FFB6C1", "#FFDAB9", "#E0FFFF", "#E6E6FA", "#FFFACD"];
     const newBalloons = Array.from({ length: 12 }).map(() => ({
@@ -98,6 +100,7 @@ export default function Home() {
 
   return (
     <div className="page">
+      <div className="sparkles" aria-hidden></div>
       <div className="balloons" aria-hidden>
         {balloons.map((b, i) => (
           <div
@@ -118,6 +121,7 @@ export default function Home() {
       <header className="hero">
         <h1 className="title">Thiệp Mời Thôi Nôi Bé Mỡ 🎂</h1>
         <p className="subtitle">Trân trọng kính mời mọi người đến chung vui cùng bé Minh Triết 💚</p>
+
         <div className="avatar">
           <div className="avatar-ring" />
           <div className="avatar-inner">Ảnh bé Mỡ đang cập nhật ✨</div>
@@ -172,23 +176,10 @@ export default function Home() {
         <section className="wishes card fade-section">
           <h2>💌 Gửi Lời Chúc Đến Bé Mỡ</h2>
           <form onSubmit={handleSubmit} className="wish-form">
-            <input
-              type="text"
-              placeholder="Tên của bạn"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <textarea
-              placeholder="Lời chúc dễ thương..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={3}
-              required
-            />
+            <input type="text" placeholder="Tên của bạn" value={name} onChange={(e) => setName(e.target.value)} required />
+            <textarea placeholder="Lời chúc dễ thương..." value={message} onChange={(e) => setMessage(e.target.value)} rows={3} required />
             <button type="submit" className="btn-send">Gửi lời chúc 💚</button>
           </form>
-
           <div className="messages">
             {wishes.length === 0 ? (
               <p className="muted">Chưa có lời chúc nào — bạn là người đầu tiên nhé!</p>
@@ -209,15 +200,10 @@ export default function Home() {
         </section>
       </main>
 
-      <audio
-        id="bgMusic"
-        loop
-        src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_45b8e29c10.mp3?filename=happy-birthday-piano-14175.mp3"
-      />
-      <button className="music-btn" onClick={toggleMusic}>
-        {isPlaying ? "🎵" : "🔇"}
-      </button>
+      <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_45b8e29c10.mp3?filename=happy-birthday-piano-14175.mp3" />
+      <button className="music-btn" onClick={toggleMusic}>{isPlaying ? "🎵" : "🔇"}</button>
 
+      {/* ✅ CSS - đã căn giữa form lời chúc */}
       <style jsx>{`
         .page { font-family: "Quicksand", system-ui, sans-serif; background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%); color: #234927; min-height: 100vh; display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 80px; }
         .hero { padding: 40px 20px 20px; }
@@ -227,28 +213,75 @@ export default function Home() {
         .avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: #fffbe6; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #5a5a5a; text-align: center; padding: 8px; }
         .avatar-ring { position: absolute; top: -8px; left: -8px; width: 156px; height: 156px; border-radius: 50%; border: 3px solid #ffe082; z-index: -1; }
         .avatar-glow { position: absolute; top: -16px; left: -16px; width: 172px; height: 172px; border-radius: 50%; box-shadow: 0 0 28px rgba(255, 230, 90, 0.5); z-index: -2; }
+
         section { width: 90%; max-width: 960px; margin: 28px auto; padding: 22px 20px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); opacity: 0; transform: translateY(30px); transition: all 1s ease; background: #fffdf5; }
         section.visible { opacity: 1; transform: translateY(0); animation: glow 2.8s ease-out; }
         @keyframes glow { 0% { box-shadow: 0 0 0 rgba(255, 255, 255, 0); } 25% { box-shadow: 0 0 18px rgba(255, 243, 150, 0.6); } 50% { box-shadow: 0 0 28px rgba(255, 230, 90, 0.8); } 100% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); } }
+
         .countdown-box { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; margin-top: 14px; }
         .time-box { background: linear-gradient(180deg, #fffef0, #fffde7); border: 2px solid #f3e5ab; border-radius: 14px; padding: 14px 20px; min-width: 70px; box-shadow: 0 6px 16px rgba(0,0,0,0.05), 0 0 12px rgba(255,235,59,0.3); }
         .time-box span { font-size: 1.9rem; font-weight: 700; color: #2e7d32; }
         .time-box p { margin: 0; color: #5f7d5f; font-size: 0.95rem; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-top: 12px; }
         .grid-item img { width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .placeholder { width: 100%; height: 100px; border-radius: 12px; background: #fff7e6; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .placeholder-text { font-size: 0.85rem; color: #7a7a7a; }
-        .wish-form { max-width: 480px; margin: 0 auto; text-align: left; }
-        .wish-form input, .wish-form textarea { width: 100%; padding: 10px 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.95rem; }
-        .btn-send { background: linear-gradient(180deg,#81c784,#5aa25a); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: transform 0.2s; }
+
+        /* ✅ Form lời chúc căn giữa đẹp */
+        .wish-form {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+
+        .wish-form input,
+        .wish-form textarea {
+          width: 100%;
+          max-width: 500px;
+          box-sizing: border-box;
+          padding: 10px 12px;
+          margin-bottom: 10px;
+          border-radius: 10px;
+          border: 1px solid #ddd;
+          font-size: 0.95rem;
+        }
+
+        .btn-send {
+          background: linear-gradient(180deg,#81c784,#5aa25a);
+          color: white;
+          border: none;
+          padding: 10px 18px;
+          border-radius: 10px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: transform 0.2s;
+          align-self: center;
+        }
+
         .btn-send:hover { transform: scale(1.05); }
-        .messages { margin-top: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .messages .message { background: #fffde7; border-radius: 12px; padding: 10px 14px; margin-top: 8px; text-align: left; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+
+        .messages .message {
+          background: #fffde7;
+          border-radius: 12px;
+          padding: 10px 14px;
+          margin-top: 8px;
+          text-align: left;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
         .music-btn { position: fixed; right: 18px; bottom: 18px; width: 56px; height: 56px; border-radius: 50%; border: none; background: linear-gradient(180deg,#81c784,#5aa25a); color: white; font-size: 1.3rem; box-shadow: 0 8px 22px rgba(0,0,0,0.18); cursor: pointer; z-index: 999; transition: transform 0.2s; }
         .music-btn:hover { transform: scale(1.1); }
+
+        /* Balloon animation */
         .balloons { position: fixed; width: 100%; height: 100%; top:0; left:0; pointer-events:none; overflow: hidden; }
         .balloon { position: absolute; bottom: -60px; border-radius: 50%; opacity: 0.85; animation-name: floatUp; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
-        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity:0.7; } 50% { transform: translateY(-50vh) rotate(15deg); opacity:0.85; } 100% { transform: translateY(-110vh) rotate(-10deg); opacity:0; } }
+        @keyframes floatUp {
+          0% { transform: translateY(0) rotate(0deg); opacity:0.7; }
+          50% { transform: translateY(-50vh) rotate(15deg); opacity:0.85; }
+          100% { transform: translateY(-110vh) rotate(-10deg); opacity:0; }
+        }
       `}</style>
     </div>
   );
