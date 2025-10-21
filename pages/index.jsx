@@ -17,7 +17,6 @@ export default function Home() {
     }
   }, []);
 
-  // Countdown
   useEffect(() => {
     const targetDate = new Date("2024-11-02T11:30:00").getTime();
     const timer = setInterval(() => {
@@ -37,7 +36,6 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  // Scroll fade-in effect
   useEffect(() => {
     const sections = document.querySelectorAll("section");
     const reveal = () => {
@@ -69,12 +67,36 @@ export default function Home() {
     setIsPlaying(!isPlaying);
   };
 
+  const [balloons, setBalloons] = useState([]);
+  useEffect(() => {
+    const colors = ["#FFB6C1", "#FFDAB9", "#E0FFFF", "#E6E6FA", "#FFFACD"];
+    const newBalloons = Array.from({ length: 12 }).map(() => ({
+      left: Math.random() * 90 + "%",
+      size: 25 + Math.random() * 35 + "px",
+      color: colors[Math.floor(Math.random() * colors.length)],
+      duration: 8 + Math.random() * 6 + "s",
+      delay: Math.random() * 5 + "s",
+    }));
+    setBalloons(newBalloons);
+  }, []);
+
   return (
     <div className="page">
-      <div className="sparkles" aria-hidden />
+      <div className="sparkles" aria-hidden></div>
       <div className="balloons" aria-hidden>
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className={`balloon b${i + 1}`} />
+        {balloons.map((b, i) => (
+          <div
+            key={i}
+            className="balloon"
+            style={{
+              left: b.left,
+              width: b.size,
+              height: b.size,
+              backgroundColor: b.color,
+              animationDuration: b.duration,
+              animationDelay: b.delay,
+            }}
+          />
         ))}
       </div>
 
@@ -106,9 +128,7 @@ export default function Home() {
             <div className="countdown-box">
               {["Ngày", "Giờ", "Phút", "Giây"].map((label, i) => (
                 <div className="time-box" key={label}>
-                  <span>
-                    {Object.values(timeLeft)[i]}
-                  </span>
+                  <span>{Object.values(timeLeft)[i]}</span>
                   <p>{label}</p>
                 </div>
               ))}
@@ -166,77 +186,4 @@ export default function Home() {
       <button className="music-btn" onClick={toggleMusic}>{isPlaying ? "🎵" : "🔇"}</button>
 
       <style jsx>{`
-        .page {
-          font-family: "Quicksand", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-          background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%);
-          color: #234927;
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          padding-bottom: 60px;
-        }
-
-        section {
-          width: 90%;
-          max-width: 960px;
-          margin: 20px auto;
-          padding: 20px 16px;
-          border-radius: 14px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-          opacity: 0;
-          transform: translateY(30px);
-          transition: all 0.8s ease;
-        }
-        section.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .info.card { background: #ffffffd9; }
-        .countdown.card { background: #fffbeecf; }
-        .gallery.card { background: #f4ffefcf; }
-        .wishes.card { background: #fffde7cf; }
-        .thanks.card { background: #f8fff1cf; }
-
-        .countdown-box {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 16px;
-          margin-top: 10px;
-        }
-        .time-box {
-          background: linear-gradient(180deg, #fffff0, #fffde7);
-          border: 2px solid #f3e5ab;
-          border-radius: 14px;
-          padding: 12px 18px;
-          min-width: 70px;
-          box-shadow: 0 6px 14px rgba(0,0,0,0.05), 0 0 10px rgba(255,235,59,0.3);
-        }
-        .time-box span {
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: #2e7d32;
-        }
-        .time-box p { margin: 0; color: #5f7d5f; font-size: 0.9rem; }
-
-        .music-btn {
-          position: fixed;
-          right: 18px;
-          bottom: 18px;
-          width: 52px;
-          height: 52px;
-          border-radius: 50%;
-          border: none;
-          background: linear-gradient(180deg,#81c784,#5aa25a);
-          color: white;
-          font-size: 1.25rem;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-          cursor: pointer;
-          z-index: 999;
-        }
-      `}</style>
-    </div>
-  );
-}
+        .page { font-family: "Quicksand", system-ui, sans-serif; background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%); color: #234927; min-height: 100vh; display: flex; flex-direction: column; align-items: center; text-align
