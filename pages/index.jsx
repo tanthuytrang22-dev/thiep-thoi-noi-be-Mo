@@ -4,31 +4,6 @@ export default function Home() {
   const [wishes, setWishes] = useState([]);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  // Cập nhật countdown (ví dụ tới ngày 25/10/2025)
-  useEffect(() => {
-    const targetDate = new Date("2025-10-25T18:00:00").getTime();
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-
-      if (distance <= 0) {
-        clearInterval(interval);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((distance / (1000 * 60)) % 60),
-        seconds: Math.floor((distance / 1000) % 60),
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -42,17 +17,6 @@ export default function Home() {
     <div className="invitation">
       <h1>🌸 Thiệp Mời Thôi Nôi Bé Mỡ 🌸</h1>
       <p>Trân trọng kính mời mọi người đến dự tiệc thôi nôi bé Mỡ!</p>
-
-      {/* Countdown sinh động */}
-      <div className="countdown-container">
-        <h2 className="countdown-title">⏰ Đếm ngược tới ngày thôi nôi!</h2>
-        <div className="countdown">
-          <div><span>{timeLeft.days}</span><small>Ngày</small></div>
-          <div><span>{timeLeft.hours}</span><small>Giờ</small></div>
-          <div><span>{timeLeft.minutes}</span><small>Phút</small></div>
-          <div><span>{timeLeft.seconds}</span><small>Giây</small></div>
-        </div>
-      </div>
 
       <img src="https://i.imgur.com/QF5L4qX.png" alt="bé Mỡ" className="baby-img" />
 
@@ -99,55 +63,11 @@ export default function Home() {
           color: #e75480;
           font-size: 2.2rem;
           margin-bottom: 10px;
-          animation: fadeIn 1.5s ease-in-out;
         }
 
         p {
           margin: 5px 0;
           font-size: 1.1rem;
-        }
-
-        .countdown-container {
-          margin: 25px 0;
-          animation: pulse 3s infinite;
-        }
-
-        .countdown-title {
-          font-size: 1.3rem;
-          color: #e75480;
-          margin-bottom: 10px;
-          animation: colorShift 5s infinite linear;
-        }
-
-        .countdown {
-          display: flex;
-          justify-content: center;
-          gap: 15px;
-        }
-
-        .countdown div {
-          background: white;
-          padding: 10px 14px;
-          border-radius: 12px;
-          box-shadow: 0 4px 10px rgba(255, 182, 193, 0.4);
-          transition: transform 0.3s ease;
-        }
-
-        .countdown div:hover {
-          transform: scale(1.1);
-        }
-
-        .countdown span {
-          display: block;
-          font-size: 1.6rem;
-          font-weight: bold;
-          color: #ff3d7f;
-          text-shadow: 0 0 8px rgba(255, 0, 102, 0.3);
-        }
-
-        .countdown small {
-          font-size: 0.8rem;
-          color: #777;
         }
 
         .baby-img {
@@ -206,22 +126,6 @@ export default function Home() {
           width: 90%;
           box-shadow: 0 2px 6px rgba(255, 182, 193, 0.3);
           text-align: left;
-        }
-
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.02); }
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes colorShift {
-          0% { color: #e75480; }
-          50% { color: #ff4d88; }
-          100% { color: #e75480; }
         }
       `}</style>
     </div>
