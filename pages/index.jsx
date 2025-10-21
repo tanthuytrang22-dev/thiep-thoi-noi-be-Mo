@@ -141,4 +141,75 @@ export default function Home() {
           />
           <button
             type="submit"
-            className="bg-green-500 text-white px
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition"
+          >
+            Gửi lời chúc
+          </button>
+        </form>
+      </div>
+
+      {/* Wishes */}
+      <div className="px-4 py-8">
+        <h3 className="text-2xl font-semibold text-green-700 mb-4 text-center">💚 Lời chúc từ mọi người 💚</h3>
+        {wishes.length > 0 ? (
+          <div className="space-y-3">
+            {wishes.map((wish, index) => (
+              <div
+                key={index}
+                className="bg-white p-3 rounded-xl shadow border border-green-100 fade-in"
+              >
+                <p className="font-bold">{wish.name}</p>
+                <p>{wish.message}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">Hãy là người đầu tiên gửi lời chúc nhé 💕</p>
+        )}
+      </div>
+
+      {/* Balloons */}
+      <style>{`
+        .balloon {
+          position: fixed;
+          bottom: -100px;
+          width: 30px;
+          height: 40px;
+          border-radius: 50%;
+          opacity: 0.8;
+          animation: floatUp ease-in infinite;
+          z-index: 0;
+        }
+
+        @keyframes floatUp {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-110vh) rotate(360deg);
+            opacity: 0;
+          }
+        }
+
+        .fade-in {
+          animation: fadeIn 1s ease-in;
+        }
+
+        .zoom-in {
+          animation: zoomIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+          from { transform: scale(0.9); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
