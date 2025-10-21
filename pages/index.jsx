@@ -76,6 +76,20 @@ export default function Home() {
   }
 };
 
+useEffect(() => {
+  const fetchWishes = async () => {
+    try {
+      const res = await fetch("https://script.google.com/macros/s/AKfycbxC3P86qjQ-oQSCd5z5qWQ5B6rd2DyCIc_c9K2fqMaN50r-CoGIqmUH3zHo8l-avF6cEA/exec");
+      const data = await res.json();
+      setWishes(data.reverse()); // đảo ngược để lời mới lên đầu
+    } catch (err) {
+      console.error("❌ Lỗi khi tải lời chúc:", err);
+    }
+  };
+  fetchWishes();
+}, []);
+
+
 
   const toggleMusic = () => {
     const audio = document.getElementById("bgMusic");
