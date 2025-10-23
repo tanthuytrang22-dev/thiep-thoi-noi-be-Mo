@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+
+
 export default function Home() {
   const [wishes, setWishes] = useState([]);
   const [name, setName] = useState("");
@@ -218,11 +220,36 @@ useEffect(() => {
       <button className="music-btn" onClick={toggleMusic}>{isPlaying ? "🎵" : "🔇"}</button>
 
       {/* ✅ CSS - đã căn giữa form lời chúc */}
+	  import Head from "next/head";
+
+export default function Home() {
+  return (
+    <>
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@400;600&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+
       <style jsx>{`
-        .page { font-family: "Quicksand", system-ui, sans-serif; background: linear-gradient(180deg, #e0f8dc 0%, #fff8e1 100%); color: #234927; min-height: 100vh; display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 80px; }
+	  
+        .page { 
+  font-family: "Poppins", "Dancing Script", system-ui, sans-serif; 
+}
+
         .hero { padding: 40px 20px 20px; }
-        .title { font-size: 2.4rem; margin-bottom: 12px; font-weight: 700; color: #1b5e20; }
-        .subtitle { font-size: 1.15rem; color: #4b7754; max-width: 600px; margin: 0 auto 24px; }
+        .title {
+  font-family: "Dancing Script", cursive;
+  font-size: 2.8rem;
+  color: #1b5e20;
+  text-shadow: 2px 2px 8px rgba(255, 223, 186, 0.7);
+}
+.subtitle {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+}
+
         .avatar { position: relative; width: 140px; height: 140px; margin: 0 auto; }
         .avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: #fffbe6; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #5a5a5a; text-align: center; padding: 8px; }
         .avatar-ring { position: absolute; top: -8px; left: -8px; width: 156px; height: 156px; border-radius: 50%; border: 3px solid #ffe082; z-index: -1; }
