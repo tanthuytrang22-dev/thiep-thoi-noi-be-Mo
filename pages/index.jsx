@@ -127,7 +127,7 @@ export default function Home() {
       <div className="cloud"></div>
 <div className="cloud"></div>
 <div className="cloud"></div>
-{/* <div className="hearts">
+ <div className="hearts">
   {Array.from({ length: 15 }).map((_, i) => (
     <div key={i} className="heart" style={{
       left: `${Math.random() * 100}%`,
@@ -135,7 +135,7 @@ export default function Home() {
       fontSize: `${Math.random() * 12 + 10}px`
     }}>💚</div>
   ))}
-</div> */}
+</div> 
 
       <div className="sparkles" aria-hidden></div>
       <div className="balloons" aria-hidden>
