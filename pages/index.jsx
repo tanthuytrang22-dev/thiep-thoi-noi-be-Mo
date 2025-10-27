@@ -7,28 +7,60 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [images] = useState([
-  "https://i.imgur.com/abc123.jpg", // Ảnh 1
-  "https://i.imgur.com/def456.jpg", // Ảnh 2
-  "https://i.imgur.com/ghi789.jpg", // Ảnh 3
-  "https://i.imgur.com/jkl012.jpg", // Ảnh 4
-  "https://i.imgur.com/mno345.jpg", // Ảnh 5
-  "https://i.imgur.com/pqr678.jpg", // Ảnh 6
-  "https://i.imgur.com/stu901.jpg", // Ảnh 7
-  "https://i.imgur.com/vwx234.jpg", // Ảnh 8
-  "https://i.imgur.com/yzA567.jpg", // Ảnh 9
-  "https://i.imgur.com/Bcd890.jpg", // Ảnh 10
-  "https://i.imgur.com/Efg123.jpg", // Ảnh 11
-  "https://i.imgur.com/Hij456.jpg"  // Ảnh 12
+  "/image/1.jpg", // Ảnh 1
+  "/image/2.jpg", // Ảnh 2
+  "/image/3.jpg", // Ảnh 3
+  "/image/4.jpg", // Ảnh 4
+  "/image/5.jpg", // Ảnh 5
+  "/image/6.jpg", // Ảnh 6
+  "/image/7.jpg", // Ảnh 7
+  "/image/8.jpg", // Ảnh 8
+  "/image/9.jpg", // Ảnh 9
+  "/image/10.jpg", // Ảnh 10
+  "/image/11.jpg", // Ảnh 11
+  "/image/12.jpg"  // Ảnh 12
 ]);
   const [balloons, setBalloons] = useState([]);
 
-  useEffect(() => {
-    const audio = document.getElementById("bgMusic");
-    if (audio) {
-      audio.volume = 0.45;
-      audio.play().catch(() => {});
+  // useEffect(() => {
+  //   const audio = document.getElementById("bgMusic");
+  //   if (audio) {
+  //     audio.volume = 0.45;
+  //     audio.play().catch(() => {});
+  //   }
+  // }, []);
+ useEffect(() => {
+  const audio = document.getElementById("bgMusic");
+  if (audio) {
+    audio.volume = 0.6;
+  }
+
+  const startMusic = () => {
+    if (audio && audio.paused) {
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.log("Autoplay bị chặn:", err));
     }
-  }, []);
+
+    // 👉 Gỡ listener chỉ sau khi đã gọi play()
+    window.removeEventListener("click", startMusic);
+    window.removeEventListener("touchstart", startMusic);
+    window.removeEventListener("scroll", startMusic);
+  };
+
+  // 👉 Chỉ gắn listener ở đây (ngoài), không cần gắn lại trong hàm
+  window.addEventListener("click", startMusic);
+  window.addEventListener("touchstart", startMusic);
+  window.addEventListener("scroll", startMusic);
+
+  return () => {
+    window.removeEventListener("click", startMusic);
+    window.removeEventListener("touchstart", startMusic);
+    window.removeEventListener("scroll", startMusic);
+  };
+}, []);
+
+
 
   // Countdown
   useEffect(() => {
@@ -159,11 +191,18 @@ export default function Home() {
         <h1 className="title">Thiệp Mời Thôi Nôi Bé Mỡ 🎂</h1>
         <p className="subtitle">Trân trọng kính mời mọi người đến chung vui cùng bé Minh Triết 💚</p>
 
-        <div className="avatar">
-          <div className="avatar-ring" />
-          <div className="avatar-inner">Ảnh bé Mỡ đang cập nhật ✨</div>
-          <div className="avatar-glow" />
-        </div>
+       <div className="avatar">
+  <div className="avatar-ring" />
+  <div className="avatar-inner">
+    <img
+      src="/image/13.jpg" // 👉 thay bằng link ảnh thật của bé Mỡ
+      alt="Bé Mỡ"
+      className="avatar-img"
+    />
+  </div>
+  <div className="avatar-glow" />
+</div>
+
       </header>
 
       <main className="content">
@@ -194,7 +233,7 @@ export default function Home() {
         </section>
 
         <section className="gallery card fade-section">
-  <h2>📸 Album Bé Mỡ (12 ảnh — thay link khi có)</h2>
+  <h2>📸 Album Bé Mỡ </h2>
   <div className="grid">
     {images.map((src, idx) => (
       <div key={idx} className="grid-item">
@@ -240,7 +279,7 @@ export default function Home() {
         </section>
       </main>
 
-      <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_45b8e29c10.mp3?filename=happy-birthday-piano-14175.mp3" />
+     <audio id="bgMusic" loop src="/audio/Birthday.mp3" />
       <button className="music-btn" onClick={toggleMusic}>{isPlaying ? "🎵" : "🔇"}</button>
       {/* --- cloud footer: dán vào đây --- */}
       <div className="cloud-footer"></div>
@@ -345,6 +384,9 @@ background-attachment: fixed;
     justify-content: center;
     font-size: 0.85rem;
     color: #777;
+      overflow: hidden;   /* ✅ Ẩn phần ảnh thừa */
+  position: relative; /* ✅ Để ảnh nằm gọn trong khung */
+
   }
   .avatar-ring {
     position: absolute;
@@ -359,6 +401,16 @@ background-attachment: fixed;
   .avatar-glow {
   box-shadow: 0 0 28px rgba(76, 185, 99, 0.5); /* ánh sáng xanh lá */
 }
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* ✅ Cắt ảnh vừa khung, không méo */
+  border-radius: 50%;
+  position: absolute; /* ✅ Giúp ảnh lấp đầy vùng tròn */
+  top: 0;
+  left: 0;
+}
+
   @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
@@ -539,3 +591,4 @@ background-attachment: fixed;
     </div>
   );
 }
+
